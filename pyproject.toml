@@ -1,0 +1,36 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "microphaselab"
+version = "0.2.2"
+description = "Teaching toolkit for steel microstructure segmentation and classical baselines"
+readme = "README.md"
+requires-python = ">=3.10"
+license = "MIT"
+authors = [{name = "MicroPhaseLab contributors"}]
+dependencies = [
+  "numpy>=1.24",
+  "pandas>=2.0",
+  "Pillow>=10.0",
+  "matplotlib>=3.7",
+  "PyYAML>=6.0",
+  "scikit-image>=0.22",
+]
+
+[project.optional-dependencies]
+dev = ["pytest>=8.0", "ruff>=0.6"]
+
+[project.scripts]
+microphaselab = "microphaselab.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py310"
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "UP", "B"]

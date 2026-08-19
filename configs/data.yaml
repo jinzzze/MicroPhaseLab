@@ -1,0 +1,18 @@
+dataset:
+  name: aachen_heerlen_ma
+  image_column: Image_url
+  polygon_column: polygon
+  group_column: Type,Temperature
+  seed: 42
+
+paths:
+  images_dir: data/raw/images
+  annotations: data/raw/annotations.csv
+  metadata: data/raw/metadata.csv
+  processed_dir: data/processed
+  splits_dir: data/splits
+
+split:
+  train: 0.70
+  val: 0.15
+  test: 0.15

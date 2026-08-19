@@ -1,0 +1,19 @@
+cff-version: 1.2.0
+message: "If you use MicroPhaseLab, cite this software and the Aachen-Heerlen dataset."
+title: "MicroPhaseLab"
+type: software
+version: 0.2.2
+date-released: 2026-08-03
+license: MIT
+authors:
+  - name: "MicroPhaseLab contributors"
+preferred-citation:
+  type: article
+  title: "Aachen-Heerlen annotated steel microstructure dataset"
+  authors:
+    - family-names: Iren
+      given-names: Deniz
+  journal: Scientific Data
+  volume: 8
+  year: 2021
+  doi: 10.1038/s41597-021-00926-7
