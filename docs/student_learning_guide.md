@@ -41,10 +41,15 @@ informatics experiment:
 Machine learning is a way to make a program improve at a task by studying examples
 instead of following only hand-written rules.
 
-For a simple analogy, imagine showing a student many micrographs where an instructor
-has highlighted MA regions. Over time, the student learns which brightness patterns,
-shapes, and neighbourhoods are associated with MA. A machine learning model does the
-same thing mathematically.
+Imagine a lab exercise with many microscope images. For each image, an instructor
+colours the MA regions red and leaves the background uncoloured. A student first tries
+to mark MA in a new image, compares the answer with the instructor's version, and
+adjusts what they look for after every mistake. After many examples, the student may
+recognise that MA often has particular brightness, texture, shape, and surrounding
+context. A machine learning model follows the same learning pattern mathematically:
+it receives an image and the instructor's correct mask, measures its mistakes, and
+adjusts its internal numerical settings to make the next prediction closer to the
+correct mask.
 
 In this project:
 
