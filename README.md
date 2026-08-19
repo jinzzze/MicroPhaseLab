@@ -131,7 +131,8 @@ ruff check .
 ~~~
 
 See docs/v0.3_unet_plan.md for the model design and acceptance criteria, and
-docs/experiment_report_template.md for a real-data experiment report.
+docs/experiment_report_template.md for a real-data experiment report. New students
+should begin with docs/student_learning_guide.md.
 
 ## Citation and license
 
