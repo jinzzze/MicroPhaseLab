@@ -73,6 +73,27 @@ python -m pytest -q
 `outputs/baseline/demo/summary.json`，将 Dice 与 IoU 记录在实验笔记中。接着打开
 `notebooks/01_data_pipeline.ipynb`，逐格完成第一课。
 
+### 结果解读与验收
+
+先确认 `quality_report.json` 的 `ok` 为 `true`：它表示每一个 image—mask 对都存在、
+尺寸一致，且 mask 只包含 0 和 1。`rows` 是图像数，`groups` 是可用于防泄漏划分的
+样品组数；两者不是同一个概念。
+
+再阅读 `summary.json` 与 `metrics_per_image.csv`。其中：
+
+- **Precision** = 被预测为 MA 的像素中，真正是 MA 的比例；低值意味着背景被误判为 MA。
+- **Recall** = 专家标注的 MA 像素中被找到的比例；低值意味着漏检 MA。
+- **Dice** = `2TP / (2TP + FP + FN)`，强调前景区域的重叠，适合类别不平衡的分割任务。
+- **IoU** = `TP / (TP + FP + FN)`，比 Dice 更严格；同一预测下 IoU 通常低于 Dice。
+- **area_fraction_absolute_error** = 预测与专家 mask 的二维 MA 面积分数之差的绝对值；
+  它适合回答“面积比例是否接近”，但不能说明边界位置是否正确。
+
+当前固定合成演示的参考结果约为 Dice `0.997`、IoU `0.993`、平均面积分数绝对误差
+`0.0007`。合成图中 MA 被刻意绘制为明亮区域，因而 Otsu 很容易分割；这些数字**不是**
+真实钢材图像的性能承诺。通过本课的最低标准是：质量报告通过、能解释每项指标、并能从
+overlay 找出至少一种可能的假阳性或假阴性来源。只有在真实数据完成 20 张人工检查、
+按 group 划分并冻结 test 集后，才能报告真实数据的测试指标。
+
 ## 3. 先运行离线演示
 
 该命令生成两张合成 SEM 风格图、polygon CSV、metadata CSV，并走完数据准备流程：
@@ -99,23 +120,23 @@ microphaselab visualize \
 数据源：Aachen–Heerlen Annotated Steel Microstructure Dataset。完整 PNG 压缩包约
 1.14 GB，因此默认只下载较小的 polygon 与 metadata CSV。
 
-```bash
+```powershell
 microphaselab download --output-dir data/raw
 ```
 
 确认文件已经生成：
 
-```bash
-ls -lh data/raw/annotations.csv data/raw/metadata.csv
+```powershell
+Get-Item data/raw/annotations.csv, data/raw/metadata.csv
 ```
 
 ## 5. 下载并解压官方 PNG 图像
 
 完整 PNG 压缩包约 1.14 GB，解压后会包含 1,705 张带专家标注的图像：
 
-```bash
+```powershell
 microphaselab download --output-dir data/raw --include-images
-find data/raw/images -type f -iname '*.png' | wc -l
+(Get-ChildItem data/raw/images -Recurse -File -Filter *.png).Count
 ```
 
 下载器支持中断后续传，并会在解压前核对 Figshare 公布的精确文件大小与 MD5。
@@ -140,31 +161,17 @@ data/raw/
 
 ## 6. 生成真实 MA mask 与 manifest
 
-```bash
-microphaselab prepare \
-  --images-dir data/raw/images \
-  --annotations data/raw/annotations.csv \
-  --metadata data/raw/metadata.csv \
-  --output-dir data/processed \
+```powershell
+microphaselab prepare --images-dir data/raw/images --annotations data/raw/annotations.csv --metadata data/raw/metadata.csv --output-dir data/processed `
   --group-column Type,Temperature
 ```
 
 `Type + Temperature` 对应论文描述的10个不同化学成分/热处理样品组合，比只按
 `Type` 分组更安全。运行后检查：
 
-```bash
-microphaselab check \
-  --manifest data/processed/manifest.csv \
-  --report data/processed/quality_report.json
-
-python - <<'PY'
-import pandas as pd
-
-m = pd.read_csv("data/processed/manifest.csv")
-print("masks:", len(m))
-print("groups:", m["group_id"].nunique())
-print(m["group_id"].value_counts().sort_index())
-PY
+```powershell
+microphaselab check --manifest data/processed/manifest.csv --report data/processed/quality_report.json
+python -c "import pandas as pd; m = pd.read_csv('data/processed/manifest.csv'); print('masks:', len(m)); print('groups:', m['group_id'].nunique()); print(m['group_id'].value_counts().sort_index())"
 ```
 
 预期 `masks` 接近 `1705`、`groups` 接近 `10`，质量报告中的 `ok` 应为 `true`。
@@ -181,28 +188,20 @@ PY
 
 如果官方 CSV 的列名与你下载的版本不同，可显式指定：
 
-```bash
-microphaselab prepare \
-  --images-dir data/raw/images \
-  --annotations data/raw/annotations.csv \
-  --metadata data/raw/metadata.csv \
-  --output-dir data/processed \
-  --image-column Image_url \
-  --polygon-column polygon \
+```powershell
+microphaselab prepare --images-dir data/raw/images --annotations data/raw/annotations.csv --metadata data/raw/metadata.csv --output-dir data/processed `
+  --image-column Image_url --polygon-column polygon `
   --group-column sample_id
 ```
 
 ## 7. 随机人工检查至少20张 overlay
 
-```bash
-microphaselab visualize \
-  --manifest data/processed/manifest.csv \
-  --output-dir outputs/figures/official_qc_seed42 \
-  --limit 20 \
-  --random \
+```powershell
+microphaselab visualize --manifest data/processed/manifest.csv --output-dir outputs/figures/official_qc_seed42 `
+  --limit 20 --random `
   --seed 42
 
-xdg-open outputs/figures/official_qc_seed42
+Invoke-Item outputs/figures/official_qc_seed42
 ```
 
 `qc_selection.csv` 会记录本次固定随机抽到的20张图。逐张检查 polygon 是否覆盖真实
@@ -211,11 +210,8 @@ MA constituent，重点排查：坐标轴互换、缩放错误、整体平移、
 
 ## 8. 建立无泄漏划分
 
-```bash
-microphaselab split \
-  --manifest data/processed/manifest.csv \
-  --output-dir data/splits \
-  --group-column group_id \
+```powershell
+microphaselab split --manifest data/processed/manifest.csv --output-dir data/splits --group-column group_id `
   --seed 42
 ```
 
@@ -227,9 +223,8 @@ split。若元数据没有可靠的 sample 字段，程序会明确标记回退�
 
 先在 validation 集运行和调整参数；不要用 test 集调参：
 
-```bash
-microphaselab baseline \
-  --manifest data/splits/val.csv \
+```powershell
+microphaselab baseline --manifest data/splits/val.csv `
   --output-dir outputs/baseline/otsu_val
 ```
 
@@ -245,14 +240,9 @@ outputs/baseline/otsu_val/
 默认流程为灰度图 → Gaussian blur → Otsu → opening → closing → 删除小区域与填补
 小孔洞。根据 validation 结果确定一套参数后，冻结参数并且只运行一次 test：
 
-```bash
-microphaselab baseline \
-  --manifest data/splits/test.csv \
-  --output-dir outputs/baseline/otsu_test \
-  --gaussian-sigma 1.0 \
-  --opening-radius 1 \
-  --closing-radius 2 \
-  --min-object-size 32 \
+```powershell
+microphaselab baseline --manifest data/splits/test.csv --output-dir outputs/baseline/otsu_test `
+  --gaussian-sigma 1.0 --opening-radius 1 --closing-radius 2 --min-object-size 32 `
   --min-hole-size 32
 ```
 
@@ -293,7 +283,8 @@ MicroPhaseLab/
 ## 路线图
 
 - v0.2：Otsu + morphology 传统基线（当前）
-- v0.3：PyTorch Dataset、U-Net、BCE + Dice、可复现训练
+- v0.3：PyTorch Dataset、U-Net、BCE + Dice、可复现训练（见
+  [v0.3 实现计划](docs/v0.3_unet_plan.md)）
 - v0.4：面积分数与形貌定量分析
 - v0.5：Gradio 演示界面
 - v1.0：完整中文教学课程、预训练权重与发布文档
