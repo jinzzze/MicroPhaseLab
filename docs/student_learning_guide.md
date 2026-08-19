@@ -41,15 +41,19 @@ informatics experiment:
 Machine learning is a way to make a program improve at a task by studying examples
 instead of following only hand-written rules.
 
-Imagine a lab exercise with many microscope images. For each image, an instructor
-colours the MA regions red and leaves the background uncoloured. A student first tries
-to mark MA in a new image, compares the answer with the instructor's version, and
-adjusts what they look for after every mistake. After many examples, the student may
-recognise that MA often has particular brightness, texture, shape, and surrounding
-context. A machine learning model follows the same learning pattern mathematically:
-it receives an image and the instructor's correct mask, measures its mistakes, and
-adjusts its internal numerical settings to make the next prediction closer to the
-correct mask.
+Imagine a geography exercise using aerial photographs of London. For each photograph,
+the teacher colours every public park green and leaves roads, buildings, and the River
+Thames uncoloured. A student first tries to mark the parks in a new photograph, then
+compares their map with the teacher's answer. With many examples from different parts
+of London, the student learns that parks tend to have particular colours, textures,
+shapes, and neighbouring features. A machine learning model follows the same pattern
+mathematically: it receives an image and the teacher's correct pixel mask, measures
+its mistakes, and adjusts its internal numerical settings so that the next predicted
+mask is closer to the correct one.
+
+In MicroPhaseLab, the aerial photograph is replaced by a micrograph, and the park mask
+is replaced by the expert MA mask. The learning process is the same: predict a region,
+compare it with a trusted reference, and improve from many examples.
 
 In this project:
 
