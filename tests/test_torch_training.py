@@ -11,6 +11,7 @@ import pandas as pd
 from PIL import Image
 
 from microphaselab.cli import main
+from microphaselab.inference import evaluate_predictions, predict_manifest, save_prediction_overlays
 from microphaselab.torch_dataset import ManifestSegmentationDataset, assert_disjoint_groups
 from microphaselab.training import TrainingConfig, train_model
 from microphaselab.unet import TinyUNet
@@ -97,18 +98,46 @@ class UNetTrainingTests(unittest.TestCase):
             self.assertTrue((output_dir / "metrics.csv").is_file())
             self.assertTrue((output_dir / "best.pt").is_file())
             self.assertTrue((output_dir / "validation_summary.json").is_file())
+            prediction_dir = root / "prediction"
+            prediction_result = predict_manifest(
+                output_dir / "best.pt",
+                test,
+                prediction_dir,
+                batch_size=1,
+                device="cpu",
+            )
+            evaluation_dir = root / "evaluation"
+            evaluation = evaluate_predictions(
+                test,
+                prediction_dir / "predictions",
+                evaluation_dir,
+            )
+            overlays = save_prediction_overlays(
+                test,
+                prediction_dir / "predictions",
+                root / "overlays",
+                limit=1,
+            )
+
+            self.assertEqual(prediction_result["images"], 1)
+            self.assertEqual(evaluation["images"], 1)
+            self.assertTrue((prediction_dir / "predictions" / "test_unet_mask.png").is_file())
+            self.assertTrue((evaluation_dir / "summary.json").is_file())
+            self.assertEqual(overlays, 1)
 
     def test_train_cli_runs_from_yaml_config(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             train = _write_manifest(root / "train.csv", [_write_pair(root, "train", "steel_a")])
             val = _write_manifest(root / "val.csv", [_write_pair(root, "val", "steel_b")])
+            test = _write_manifest(root / "test.csv", [_write_pair(root, "test", "steel_c")])
             config = root / "config.yaml"
             config.write_text(
                 "\n".join(
                     [
                         f"train_manifest: {train.name}",
                         f"val_manifest: {val.name}",
+                        f"test_manifest: {test.name}",
                         "output_dir: run",
                         "epochs: 1",
                         "batch_size: 1",
@@ -121,9 +150,39 @@ class UNetTrainingTests(unittest.TestCase):
             )
 
             exit_code = main(["train", "--config", str(config)])
+            prediction_dir = root / "prediction"
+            prediction_exit_code = main(
+                [
+                    "predict",
+                    "--checkpoint",
+                    str(root / "run" / "best.pt"),
+                    "--manifest",
+                    str(test),
+                    "--output-dir",
+                    str(prediction_dir),
+                    "--device",
+                    "cpu",
+                ]
+            )
+            evaluation_exit_code = main(
+                [
+                    "evaluate",
+                    "--manifest",
+                    str(test),
+                    "--predictions",
+                    str(prediction_dir / "predictions"),
+                    "--output-dir",
+                    str(root / "evaluation"),
+                    "--overlay-dir",
+                    str(root / "overlays"),
+                ]
+            )
 
             self.assertEqual(exit_code, 0)
+            self.assertEqual(prediction_exit_code, 0)
+            self.assertEqual(evaluation_exit_code, 0)
             self.assertTrue((root / "run" / "best.pt").is_file())
+            self.assertTrue((root / "evaluation" / "summary.json").is_file())
 
 
 if __name__ == "__main__":

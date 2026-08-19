@@ -79,6 +79,23 @@ def build_parser() -> argparse.ArgumentParser:
 
     train = subparsers.add_parser("train", help="Train the optional PyTorch U-Net")
     train.add_argument("--config", type=_path, required=True)
+
+    predict = subparsers.add_parser(
+        "predict", help="Write U-Net prediction masks from a checkpoint"
+    )
+    predict.add_argument("--checkpoint", type=_path, required=True)
+    predict.add_argument("--manifest", type=_path, required=True)
+    predict.add_argument("--output-dir", type=_path, required=True)
+    predict.add_argument("--threshold", type=float, default=0.5)
+    predict.add_argument("--batch-size", type=int, default=4)
+    predict.add_argument("--device", choices=("auto", "cpu", "cuda"), default="auto")
+
+    evaluate = subparsers.add_parser("evaluate", help="Evaluate U-Net masks against expert masks")
+    evaluate.add_argument("--manifest", type=_path, required=True)
+    evaluate.add_argument("--predictions", type=_path, required=True)
+    evaluate.add_argument("--output-dir", type=_path, required=True)
+    evaluate.add_argument("--overlay-dir", type=_path)
+    evaluate.add_argument("--limit", type=int, default=20)
     return parser
 
 
@@ -150,6 +167,41 @@ def main(argv: list[str] | None = None) -> int:
                 ) from error
             raise
         result = train_from_config(args.config)
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+    elif args.command == "predict":
+        try:
+            from .inference import predict_manifest
+        except ModuleNotFoundError as error:
+            if error.name == "torch":
+                raise SystemExit(
+                    "PyTorch is required for prediction. Install it with: "
+                    "python -m pip install -e \".[torch]\""
+                ) from error
+            raise
+        result = predict_manifest(
+            args.checkpoint,
+            args.manifest,
+            args.output_dir,
+            threshold=args.threshold,
+            batch_size=args.batch_size,
+            device=args.device,
+        )
+        print(json.dumps(result, indent=2, ensure_ascii=False))
+    elif args.command == "evaluate":
+        try:
+            from .inference import evaluate_predictions, save_prediction_overlays
+        except ModuleNotFoundError as error:
+            if error.name == "torch":
+                raise SystemExit(
+                    "PyTorch is required for U-Net evaluation. Install it with: "
+                    "python -m pip install -e \".[torch]\""
+                ) from error
+            raise
+        result = evaluate_predictions(args.manifest, args.predictions, args.output_dir)
+        if args.overlay_dir is not None:
+            result["overlays_written"] = save_prediction_overlays(
+                args.manifest, args.predictions, args.overlay_dir, limit=args.limit
+            )
         print(json.dumps(result, indent=2, ensure_ascii=False))
     return 0
 

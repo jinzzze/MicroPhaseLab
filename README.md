@@ -62,6 +62,21 @@ microphaselab train --config configs/unet_demo.yaml
 `outputs/unet/run_001/` 写入 `config.yaml`、`metrics.csv`、`best.pt` 和
 `validation_summary.json`。请只使用 validation 集选择参数；test 集只在参数冻结后使用。
 
+### 冻结模型后的预测与评估
+
+只在模型、epoch 和阈值已由 validation 集确定后，对 test 集运行一次：
+
+```powershell
+microphaselab predict --checkpoint outputs/unet/run_001/best.pt --manifest data/splits/test.csv --output-dir outputs/unet/run_001/test_predictions
+microphaselab evaluate --manifest data/splits/test.csv --predictions outputs/unet/run_001/test_predictions/predictions `
+  --output-dir outputs/unet/run_001/test_evaluation `
+  --overlay-dir outputs/unet/run_001/test_overlays --limit 20
+```
+
+evaluate 会写入逐图指标和总体 summary；对照图中红色是假阳性、青色是假阴性。仅加载自己
+训练或可信来源的 checkpoint。完成后按
+[实验报告模板](docs/experiment_report_template.md) 记录数据来源、划分、配置、结果与局限。
+
 macOS/Linux 用户可使用：
 
 建议使用 Python 3.10–3.12：
