@@ -1,0 +1,13 @@
+# Run from the project root after preparing group-aware train/val/test CSV files.
+train_manifest: ../data/splits/train.csv
+val_manifest: ../data/splits/val.csv
+test_manifest: ../data/splits/test.csv
+output_dir: ../outputs/unet/run_001
+seed: 42
+epochs: 10
+batch_size: 4
+learning_rate: 0.001
+image_size: 128
+base_channels: 16
+num_workers: 0
+device: auto

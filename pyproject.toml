@@ -21,6 +21,7 @@ dependencies = [
 
 [project.optional-dependencies]
 dev = ["pytest>=8.0", "ruff>=0.6"]
+torch = ["torch>=2.2"]
 
 [project.scripts]
 microphaselab = "microphaselab.cli:main"

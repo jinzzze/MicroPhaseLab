@@ -47,6 +47,21 @@ python -m pip install -e ".[dev]"
 如不想激活环境，后续把 `python` 和 `microphaselab` 分别替换成
 `.\.venv\Scripts\python.exe` 与 `.\.venv\Scripts\microphaselab.exe` 即可。
 
+### 可选：训练 v0.3 PyTorch U-Net
+
+完成真实数据的质量检查与 group-aware split 后，安装可选训练依赖：
+
+```powershell
+python -m pip install -e ".[torch]"
+microphaselab train --config configs/unet_demo.yaml
+```
+
+默认配置优先使用 GPU（如可用），否则使用 CPU。若要使用特定 CUDA 版本，请先在
+[PyTorch 官方安装页面](https://pytorch.org/get-started/locally/)选择 Windows、Pip 与
+对应计算平台，再安装本项目。训练会拒绝 group 重叠的 split，并在
+`outputs/unet/run_001/` 写入 `config.yaml`、`metrics.csv`、`best.pt` 和
+`validation_summary.json`。请只使用 validation 集选择参数；test 集只在参数冻结后使用。
+
 macOS/Linux 用户可使用：
 
 建议使用 Python 3.10–3.12：

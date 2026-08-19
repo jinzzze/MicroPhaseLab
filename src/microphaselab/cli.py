@@ -1,4 +1,4 @@
-"""Command-line entry point for MicroPhaseLab v0.2."""
+"""Command-line entry point for MicroPhaseLab."""
 
 from __future__ import annotations
 
@@ -76,6 +76,9 @@ def build_parser() -> argparse.ArgumentParser:
 
     demo = subparsers.add_parser("demo", help="Run the complete data pipeline offline")
     demo.add_argument("--output-dir", type=_path, default=Path("examples/demo"))
+
+    train = subparsers.add_parser("train", help="Train the optional PyTorch U-Net")
+    train.add_argument("--config", type=_path, required=True)
     return parser
 
 
@@ -136,6 +139,18 @@ def main(argv: list[str] | None = None) -> int:
     elif args.command == "demo":
         create_demo(args.output_dir)
         print(json.dumps({"demo_created": str(args.output_dir)}, indent=2))
+    elif args.command == "train":
+        try:
+            from .training import train_from_config
+        except ModuleNotFoundError as error:
+            if error.name == "torch":
+                raise SystemExit(
+                    "PyTorch is required for training. Install it with: "
+                    "python -m pip install -e \".[torch]\""
+                ) from error
+            raise
+        result = train_from_config(args.config)
+        print(json.dumps(result, indent=2, ensure_ascii=False))
     return 0
 
 
