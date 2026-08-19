@@ -1,0 +1,17 @@
+name: Bug report
+description: Report reproducible behavior that differs from the documentation.
+title: "[Bug]: "
+labels: ["bug"]
+body:
+  - type: textarea
+    attributes:
+      label: What happened?
+      description: Include the command, expected result, and actual result.
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Environment
+      description: Operating system, Python version, MicroPhaseLab version, and install command.
+    validations:
+      required: true

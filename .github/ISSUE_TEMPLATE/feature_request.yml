@@ -1,0 +1,17 @@
+name: Feature request
+description: Propose an improvement to the teaching workflow.
+title: "[Feature]: "
+labels: ["enhancement"]
+body:
+  - type: textarea
+    attributes:
+      label: Problem
+      description: What teaching or reproducibility problem does this solve?
+    validations:
+      required: true
+  - type: textarea
+    attributes:
+      label: Proposed change
+      description: Describe the smallest useful solution and scientific limitations.
+    validations:
+      required: true
