@@ -135,22 +135,48 @@ and false-positive/false-negative error locations before you freeze any setting.
 
 ## Optional U-Net workflow
 
-Install PyTorch after data validation and group-aware splitting:
+Install PyTorch after data validation and group-aware splitting. The project is already
+installed by the Quick Start instructions; choose **one** PyTorch installation route:
 
 ~~~powershell
+# CPU-only route
 python -m pip install -e ".[torch]"
+~~~
+
+For CUDA acceleration, do not assume that `.[torch]` will install a GPU build. Visit the
+[official PyTorch selector](https://pytorch.org/get-started/locally/), select your
+Windows, Python, and CUDA options, then run the exact command it provides in the active
+virtual environment. Verify the result before training:
+
+~~~powershell
+python -c "import torch; print('torch:', torch.__version__); print('built CUDA:', torch.version.cuda); print('CUDA available:', torch.cuda.is_available()); print('device:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
+~~~
+
+`CUDA available: True` means the GPU will be used with `device: auto`. If it is `False`,
+training still works on the CPU, but is slower; do not claim a GPU run in the experiment
+report.
+
+Use validation results to select the checkpoint and inference threshold before opening
+the test set:
+
+~~~powershell
 microphaselab train --config configs/unet_demo.yaml
-microphaselab predict --checkpoint outputs/unet/run_001/best.pt --manifest data/splits/test.csv --output-dir outputs/unet/run_001/test_predictions
+microphaselab predict --checkpoint outputs/unet/run_001/best.pt --manifest data/splits/val.csv --output-dir outputs/unet/run_001/val_predictions --threshold 0.5
+microphaselab evaluate --manifest data/splits/val.csv --predictions outputs/unet/run_001/val_predictions/predictions --output-dir outputs/unet/run_001/val_evaluation --overlay-dir outputs/unet/run_001/val_overlays --limit 20
+~~~
+
+Inspect the validation metrics and comparison figures. Record one checkpoint and one
+threshold; if you change either, create a new run and repeat validation. Only then
+evaluate the frozen choices on the test split once:
+
+~~~powershell
+microphaselab predict --checkpoint outputs/unet/run_001/best.pt --manifest data/splits/test.csv --output-dir outputs/unet/run_001/test_predictions --threshold 0.5
 microphaselab evaluate --manifest data/splits/test.csv --predictions outputs/unet/run_001/test_predictions/predictions --output-dir outputs/unet/run_001/test_evaluation --overlay-dir outputs/unet/run_001/test_overlays --limit 20
 ~~~
 
-Choose epochs and thresholds on validation data only. Run the test split once after
-those choices are frozen. Comparison figures use red for false positives and cyan for
-false negatives. Load only checkpoints that you trained or received from a trusted
-source.
-
-For a specific CPU or CUDA build, use the official PyTorch selector:
-https://pytorch.org/get-started/locally/
+Do not change a checkpoint, threshold, epoch count, or other setting after reading test
+metrics. Comparison figures use red for false positives and cyan for false negatives.
+Load only checkpoints that you trained or received from a trusted source.
 
 ## Metrics and scientific limitations
 

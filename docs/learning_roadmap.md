@@ -194,19 +194,27 @@ checkpoint on validation data, and compare it fairly with Lesson C.
 
 ### D1. Install PyTorch
 
-Install a CPU or CUDA build appropriate for your computer, using the
-[official PyTorch selector](https://pytorch.org/get-started/locally/) when necessary.
-Then install the project extra:
+The Quick Start has already installed the project. Choose one PyTorch route. For a
+CPU-only run, install the project extra:
 
 ~~~powershell
 python -m pip install -e ".[torch]"
 ~~~
 
-**Pass condition:** verify the installation with:
+For a CUDA run, do **not** assume that this extra installs a GPU build. Use the
+[official PyTorch selector](https://pytorch.org/get-started/locally/) to select Windows,
+your Python version, and the CUDA option appropriate for your system. Run the exact
+command provided by the selector in the active virtual environment.
+
+**Pass condition:** verify both the installed build and GPU availability:
 
 ~~~powershell
-python -c "import torch; print(torch.__version__)"
+python -c "import torch; print('torch:', torch.__version__); print('built CUDA:', torch.version.cuda); print('CUDA available:', torch.cuda.is_available()); print('device:', torch.cuda.get_device_name(0) if torch.cuda.is_available() else 'CPU')"
 ~~~
+
+For a CUDA run, `CUDA available` must be `True`. If it is `False`, the workflow still
+works on CPU but may be slow; report it as a CPU run rather than assuming the GPU was
+used.
 
 ### D2. Read and keep a run configuration
 
@@ -234,8 +242,9 @@ select a different checkpoint after looking at test performance.
 ### D4. Select an inference threshold on validation data only
 
 Keep the default threshold of 0.5 unless you have a reason to compare alternatives.
-If you do compare thresholds, predict and evaluate the validation split for each
-candidate, then record one frozen choice before touching the test split. For example:
+Run this validation prediction and evaluation even when keeping the default threshold
+of 0.5. If you compare thresholds, repeat it for each candidate, then record one frozen
+choice before touching the test split. For example:
 
 ~~~powershell
 microphaselab predict --checkpoint outputs/unet/run_001/best.pt --manifest data/splits/val.csv --output-dir outputs/unet/run_001/val_predictions --threshold 0.5
@@ -274,6 +283,10 @@ red indicates false positives and cyan indicates false negatives.
 **Expected outputs:** `summary.json`, `metrics_per_image.csv`, and the requested
 comparison figures. Read Dice, IoU, precision, recall, and area-fraction error
 together; none is sufficient alone.
+
+**Pass condition:** run E1 and E2 once only, after the checkpoint, threshold, and all
+other settings were recorded in Lesson D. Do not re-run the test set to choose a better
+setting; create a separate run and return to validation instead.
 
 ### E3. Write the experiment report
 
