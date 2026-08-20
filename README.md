@@ -174,8 +174,9 @@ python -m pytest -q
 ruff check .
 ~~~
 
-See docs/v0.3_unet_plan.md for the model design and acceptance criteria, and
-docs/experiment_report_template.md for a real-data experiment report. New students
+See docs/v0.3_unet_plan.md for the model design and acceptance criteria,
+[the experiment report template](docs/experiment_report_template.md), and
+[a completed real-data report example](docs/example_experiment_report.md). New students
 should begin with the setup and Lesson 1 above, then follow
 [docs/student_learning_guide.md](docs/student_learning_guide.md) and the
 [Learning Roadmap](docs/learning_roadmap.md).
