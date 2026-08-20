@@ -143,8 +143,9 @@ microphaselab baseline --manifest data/splits/val.csv --output-dir outputs/basel
 
 Read `outputs/baseline/otsu_val/summary.json` and
 `outputs/baseline/otsu_val/metrics_per_image.csv`. Inspect selected prediction masks
-with a plotting tool or create comparison figures before deciding whether a setting is
-reasonable.
+and error locations in
+[`notebooks/02_classical_baseline_analysis.ipynb`](../notebooks/02_classical_baseline_analysis.ipynb)
+before deciding whether a setting is reasonable.
 
 ### C2. Select settings only on validation data
 

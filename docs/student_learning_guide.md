@@ -148,7 +148,9 @@ same material sample should not appear in both training and test data.
 ### Lesson C: classical baseline
 
 Run the Otsu plus morphology baseline. Change one parameter on validation data and
-observe how false positives and false negatives change.
+observe how false positives and false negatives change. Then complete
+[`02_classical_baseline_analysis.ipynb`](../notebooks/02_classical_baseline_analysis.ipynb)
+to inspect per-image metrics and coloured false-positive/false-negative errors.
 
 ### Lesson D: neural-network segmentation
 

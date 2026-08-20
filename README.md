@@ -128,6 +128,11 @@ The global Otsu baseline does not use the expert-provided point of interest. It 
 teaching reference and is not directly comparable with studies that use a known point
 of interest.
 
+After the validation baseline completes, open
+[`notebooks/02_classical_baseline_analysis.ipynb`](notebooks/02_classical_baseline_analysis.ipynb)
+in JupyterLab. It explains aggregate metrics, over-segmentation, per-image variation,
+and false-positive/false-negative error locations before you freeze any setting.
+
 ## Optional U-Net workflow
 
 Install PyTorch after data validation and group-aware splitting:
