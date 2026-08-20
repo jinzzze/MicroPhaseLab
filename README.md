@@ -86,6 +86,9 @@ black in a standard image viewer; the notebook displays them with the correct sc
 When you finish the notebook, continue with [the student learning guide](docs/student_learning_guide.md),
 starting at Lesson B: quality and leakage.
 
+For the complete student path from Lesson A through the final report, use the
+[Learning Roadmap](docs/learning_roadmap.md).
+
 ## Official dataset workflow
 
 Download annotations and metadata first. The optional PNG archive is about 1.14 GB and
@@ -164,7 +167,8 @@ ruff check .
 See docs/v0.3_unet_plan.md for the model design and acceptance criteria, and
 docs/experiment_report_template.md for a real-data experiment report. New students
 should begin with the setup and Lesson 1 above, then follow
-[docs/student_learning_guide.md](docs/student_learning_guide.md).
+[docs/student_learning_guide.md](docs/student_learning_guide.md) and the
+[Learning Roadmap](docs/learning_roadmap.md).
 
 ## Citation and license
 

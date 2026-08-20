@@ -13,6 +13,8 @@ Follow the Windows or macOS/Linux setup in the [README](../README.md), including
 project root with `jupyter lab` and open
 [`notebooks/01_data_pipeline.ipynb`](../notebooks/01_data_pipeline.ipynb). The notebook
 is Lesson A; it explains the files created by the commands before you move to Lesson B.
+For the exact commands, expected outputs, pass conditions, and next steps for Lessons
+B–E, follow the [Learning Roadmap](learning_roadmap.md).
 
 ## The learning journey
 
