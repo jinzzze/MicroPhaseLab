@@ -137,6 +137,21 @@ scale mismatch, or repeated full-image prediction failure.
 - **Mixed errors:** some regions were partly detected but had inaccurate boundaries or
   nearby extra predictions.
 
+### Selected test-set examples
+
+`IMG_01425` is mainly a false-negative example. The expert mask contains several MA
+regions, but the U-Net finds only a small part of one region. The cyan areas in the
+error panel make the missed expert-labelled pixels visible.
+
+![False-negative-dominated U-Net test example](assets/example_report/IMG_01425_comparison.png)
+
+`IMG_01445` shows a mixed-error example. The model detects regions that do not match
+the expert mask exactly, producing both red false positives and cyan false negatives.
+It illustrates why a visually plausible prediction should still be checked against the
+reference mask and quantitative metrics.
+
+![Mixed-error U-Net test example](assets/example_report/IMG_01445_comparison.png)
+
 The figures agree with the numerical result: U-Net is substantially better than global
 thresholding, but it is not yet reliable enough for unsupervised materials conclusions.
 
