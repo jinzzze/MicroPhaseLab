@@ -66,7 +66,8 @@ microphaselab download --output-dir data/raw --include-images
 ~~~
 
 **Expected files:** `data/raw/annotations.csv`, `data/raw/metadata.csv`, and
-`data/raw/images/` containing PNG files.
+`data/raw/images/PNG/` containing 1,705 PNG files. The preparation command searches
+the image directory recursively, so continue to pass `data/raw/images` below.
 
 **If this fails:** check your internet connection, then run the same command again.
 Do not create placeholder images or edit the downloaded source files.
@@ -74,11 +75,14 @@ Do not create placeholder images or edit the downloaded source files.
 ### B2. Prepare masks and the manifest
 
 ~~~powershell
-microphaselab prepare --images-dir data/raw/images --annotations data/raw/annotations.csv --metadata data/raw/metadata.csv --output-dir data/processed --group-column Type,Temperature
+microphaselab prepare --images-dir data/raw/images --annotations data/raw/annotations.csv --metadata data/raw/metadata.csv --output-dir data/processed --group-column type,temperature --clip-out-of-bounds
 ~~~
 
 This converts expert polygons into binary masks and writes
-`data/processed/manifest.csv`. The command also prints a preparation report.
+`data/processed/manifest.csv`. The command also prints a preparation report. The
+official annotations include a vertex just outside an image boundary; the explicit
+`--clip-out-of-bounds` choice clips such vertices to the image edge rather than
+silently changing data under the strict default.
 
 **Pass condition:** the report does not list missing images, invalid annotations, or
 unexpected preparation errors. If it does, stop here and investigate before training.
@@ -109,6 +113,14 @@ microphaselab split --manifest data/processed/manifest.csv --output-dir data/spl
 `group_id` combines the selected material metadata fields. Every group must occur in
 only one split. Randomly splitting individual images can place very similar images in
 both training and test sets, giving a misleadingly high test score.
+
+Independently verify the three overlaps:
+
+~~~powershell
+python -c "import pandas as pd; from pathlib import Path; root=Path('data/splits'); groups={name:set(pd.read_csv(root / f'{name}.csv')['group_id'].astype(str)) for name in ('train','val','test')}; print({'train_val': len(groups['train'] & groups['val']), 'train_test': len(groups['train'] & groups['test']), 'val_test': len(groups['val'] & groups['test'])})"
+~~~
+
+The expected result is zero for all three overlaps.
 
 **Pass condition:** the split command succeeds and `split_summary.json` records the
 number of groups and rows in each split. The command assigns every unique group once;

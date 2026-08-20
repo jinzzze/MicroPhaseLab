@@ -97,7 +97,7 @@ contains 1,705 images.
 ~~~powershell
 microphaselab download --output-dir data/raw
 microphaselab download --output-dir data/raw --include-images
-microphaselab prepare --images-dir data/raw/images --annotations data/raw/annotations.csv --metadata data/raw/metadata.csv --output-dir data/processed --group-column Type,Temperature
+microphaselab prepare --images-dir data/raw/images --annotations data/raw/annotations.csv --metadata data/raw/metadata.csv --output-dir data/processed --group-column type,temperature --clip-out-of-bounds
 microphaselab check --manifest data/processed/manifest.csv --report data/processed/quality_report.json
 microphaselab visualize --manifest data/processed/manifest.csv --output-dir outputs/figures/official_qc_seed42 --limit 20 --random --seed 42
 microphaselab split --manifest data/processed/manifest.csv --output-dir data/splits --group-column group_id --seed 42
@@ -107,6 +107,11 @@ Inspect at least 20 overlays before splitting. Check for swapped axes, scaling e
 translations, out-of-bounds polygons, and image-mask mismatches. A group must appear
 in only one split. Do not continue if the preparation report lists missing images,
 missing group metadata, or invalid annotations.
+
+The downloaded archive stores image files under `data/raw/images/PNG`; the preparation
+command searches that tree automatically. The official annotations contain at least one
+vertex just outside an image boundary, so the documented reproducible workflow uses
+`--clip-out-of-bounds` and records that decision in the experiment report.
 
 The data source is https://doi.org/10.6084/m9.figshare.c.5185004.
 
