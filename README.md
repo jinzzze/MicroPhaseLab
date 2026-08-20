@@ -1,6 +1,6 @@
 # MicroPhaseLab
 
-MicroPhaseLab is an English-language teaching toolkit for materials and mechanical
+MicroPhaseLab is a toolkit for materials and mechanical
 engineering students. It demonstrates how to prepare, validate, segment, evaluate,
 and critically interpret steel microstructure images.
 
