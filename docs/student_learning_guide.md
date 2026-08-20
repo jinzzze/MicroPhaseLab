@@ -6,6 +6,14 @@ This guide is for students who are new to machine learning, image analysis, or b
 You do not need previous experience with neural networks to begin. Start with the
 offline demo, inspect the generated images, and work through the steps in order.
 
+## How to begin
+
+Follow the Windows or macOS/Linux setup in the [README](../README.md), including the
+`notebook` extra. Complete the offline workflow, then launch JupyterLab from the
+project root with `jupyter lab` and open
+[`notebooks/01_data_pipeline.ipynb`](../notebooks/01_data_pipeline.ipynb). The notebook
+is Lesson A; it explains the files created by the commands before you move to Lesson B.
+
 ## The learning journey
 
 MicroPhaseLab follows the same reasoning process used in a responsible materials
@@ -126,7 +134,9 @@ evaluation procedure behind it.
 ### Lesson A: data representations
 
 Run the offline demo and open the generated image, polygon CSV, mask, and overlay.
-Explain how one polygon becomes many pixel labels.
+Then complete [`01_data_pipeline.ipynb`](../notebooks/01_data_pipeline.ipynb). Explain
+how one polygon becomes many pixel labels and how a baseline prediction is compared
+with the reference mask.
 
 ### Lesson B: quality and leakage
 

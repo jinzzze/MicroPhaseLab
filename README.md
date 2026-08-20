@@ -16,18 +16,33 @@ segmentation in the Aachen-Heerlen annotated steel microstructure dataset.
 - Interpret Dice, IoU, precision, recall, and MA area-fraction error.
 - Compare a classical Otsu baseline with a reproducible U-Net experiment.
 
+## Start here: clone the repository
+
+Open PowerShell in the folder where you keep projects, then run:
+
+~~~powershell
+git clone https://github.com/jinzzze/MicroPhaseLab.git
+cd MicroPhaseLab
+~~~
+
+The remaining Windows commands in this README must be run from this project root.
+
 ## Quick start on Windows
 
 Run these PowerShell commands from the project root. The policy change applies only to
-the current terminal session:
+the current terminal session. The `notebook` extra installs JupyterLab for the guided
+Lesson 1 notebook.
 
 ~~~powershell
 py -3.12 -m venv .venv
 Set-ExecutionPolicy -Scope Process -ExecutionPolicy Bypass
 .\.venv\Scripts\Activate.ps1
 python -m pip install --upgrade pip
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dev,notebook]"
 ~~~
+
+If you only need the command-line workflow, use `python -m pip install -e ".[dev]"`
+instead.
 
 On macOS or Linux:
 
@@ -35,7 +50,7 @@ On macOS or Linux:
 python -m venv .venv
 source .venv/bin/activate
 python -m pip install --upgrade pip
-python -m pip install -e ".[dev]"
+python -m pip install -e ".[dev,notebook]"
 ~~~
 
 ## Lesson 1: offline workflow
@@ -54,6 +69,22 @@ Open examples/demo/figures and confirm that the masks cover the synthetic bright
 regions. The deterministic synthetic run is expected to obtain approximately Dice
 0.997 and IoU 0.993. These numbers verify the pipeline only; they are not a
 performance claim for real steel micrographs.
+
+### Learn with the Lesson 1 notebook
+
+After the demo and baseline commands finish, launch JupyterLab from the project root:
+
+~~~powershell
+jupyter lab
+~~~
+
+Open `notebooks/01_data_pipeline.ipynb` and run its cells in order. It explains the
+manifest, binary masks, baseline metrics, and false-positive/false-negative boundary
+errors. Raw prediction masks store values of 0 and 1, so they can look almost entirely
+black in a standard image viewer; the notebook displays them with the correct scale.
+
+When you finish the notebook, continue with [the student learning guide](docs/student_learning_guide.md),
+starting at Lesson B: quality and leakage.
 
 ## Official dataset workflow
 
@@ -132,7 +163,8 @@ ruff check .
 
 See docs/v0.3_unet_plan.md for the model design and acceptance criteria, and
 docs/experiment_report_template.md for a real-data experiment report. New students
-should begin with docs/student_learning_guide.md.
+should begin with the setup and Lesson 1 above, then follow
+[docs/student_learning_guide.md](docs/student_learning_guide.md).
 
 ## Citation and license
 
